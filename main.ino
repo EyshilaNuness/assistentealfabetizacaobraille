@@ -87,7 +87,7 @@ char getLetterFromPattern(byte pattern) {
 byte lerPadraoBraille(const int pinos[]) {
   byte padrao = 0;
   for (int i = 0; i < 6; i++) {
-    // Inverte a lógica: LOW (pressionado) vira 1, HIGH (solto) vira 0
+    
     if (digitalRead(pinos[i])) {
       padrao |= (1 << i);
     }
