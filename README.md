@@ -8,7 +8,7 @@ O dispositivo é um brinquedo educativo, interativo e de baixo custo, projetado 
 
 ---
 
-## 🎯 LÓGIGA DO DISPOSITIVO
+## 🎯 LÓGICA DO DISPOSITIVO
 
 ### 1. Ligando o aparelho
 Ao ser ligado, o dispositivo recepciona a criança com um áudio animado: *"Olá! Vamos aprender Braille?"*. Imediatamente, o microcontrolador verifica o estado da chave seletora para carregar as regras do jogo atual.
