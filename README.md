@@ -49,8 +49,8 @@ O projeto utiliza os resistores internos do Arduino (`INPUT_PULLUP`) para a leit
 
 ## ⚙️ Configuração do Ambiente e Instalação
 
-### 1. Dependências de Software
-Para compilar o código na Arduino IDE, instale a seguinte biblioteca através do Gerenciador de Bibliotecas:
+### 1. Bibliotecas
+Para usar os recursos do módulo MP3, instale a biblioteca abaixo:
 * `DFRobotDFPlayerMini` (Para comunicação simples com o módulo de áudio).
 
 ### 🎵 Tabela Mestra de Áudios
@@ -67,3 +67,5 @@ Para compilar o código na Arduino IDE, instale a seguinte biblioteca através d
 | `0031` | "Ops, tente novamente" | Feedback Negativo |
 
 ### ⚡ Diagrama Elétrico
+<img width="2856" height="2433" alt="assistente_bb" src="https://github.com/user-attachments/assets/7c5fd359-34e9-4ab2-aea9-8898c540f2db" />
+
