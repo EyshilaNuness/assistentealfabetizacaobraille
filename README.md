@@ -8,16 +8,41 @@ O dispositivo é um brinquedo educativo, interativo e de baixo custo, projetado 
 
 ---
 
-## 🎯 Funcionalidades e Modos de Operação
+## 🎯 LÓGIGA DO DISPOSITIVO
 
-O sistema possui dois modos principais, selecionados por uma chave física:
+### 1. Ligando o aparelho
+Ao ser ligado, o dispositivo recepciona a criança com um áudio animado: *"Olá! Vamos aprender Braille?"*. Imediatamente, o microcontrolador verifica o estado da chave seletora para carregar as regras do jogo atual.
 
-* **Modo Livre (Exploração):** A criança tem controle total. Ela abaixa os pinos Braille desejados e aperta o botão de confirmação. O sistema lê a matriz e reproduz em áudio qual letra foi formada (ou avisa se a combinação for inválida).
-* **Modo Desafio (O Jogo):** O dispositivo atua como um professor. Ele sorteia uma letra aleatória e pede para a criança montá-la. O sistema aguarda a criança tatear e ajustar os botões. A validação só ocorre quando o botão de confirmação é pressionado, fornecendo feedback positivo (acerto) ou estímulo para tentar novamente (erro).
+### 2. Modo Livre (Exploração)
+Neste modo, a criança tem total autonomia para descobrir o alfabeto de forma orgânica.
+* **Ação:** A criança abaixa as chaves retentivas que desejar, formando uma combinação Braille.
+* **Validação:** O sistema não avalia a matriz em tempo real. A criança pode abaixar e levantar os pinos livremente. O aparelho só realiza a leitura da combinação no exato momento em que o **Botão de Confirmação** for pressionado.
+* **Feedback Sonoro:** O dispositivo lê a combinação e toca o áudio correspondente (Ex: *"Letra A!"*). Se a criança inserir um padrão que não existe no alfabeto, o aparelho reproduz um som: *"Essa combinação não forma uma letra, tente outra vez!"*. O ciclo então se repete.
 
-### 🛡️ Engenharia de Interação (Regra de Ouro)
-Para evitar que o usuário atropele os áudios ou cause comportamentos erráticos no sistema apertando botões repetidamente, o projeto utiliza o pino `BUSY` do módulo MP3. **O sistema fica "surdo" para o botão de confirmação enquanto qualquer áudio estiver sendo reproduzido**, garantindo que a criança escute as instruções até o fim.
+### 3. Modo Desafio (O Jogo)
+Aqui, o aparelho assume o papel de um professor interativo.
+* **Algoritmo de Sorteio:** O sistema embaralha e sorteia as 26 letras de forma aleatória. O sistema tem que garantir que não haja letras repetidas até que a criança conclua todo o ciclo do alfabeto. Somente após as 26 letras, um novo sorteio é gerado.
+* **A Dinâmica:**
+  1. O aparelho solicita uma letra (Ex: *"Faça a letra D!"*) e entra em estado de espera.
+  2. A criança tateia, pensa e arruma os pinos como achar melhor, sem ser interrompida.
+  3. Ao finalizar, ela aperta o Botão de Confirmação (entregando a prova).
+  4. **Se acertar:** O aparelho toca um som de comemoração, sorteia e já pede a próxima letra.
+  5. **Se errar:** O aparelho toca um som de incentivo (*"Ops, tente de novo!"*) e continua aguardando a tentativa correta para a mesma letra. Ele não avança até que a criança acerte.
 
+---
+
+## ⚠️ PONTOS IMPORTANTES
+
+Para garantir a melhor experiência de usuário, o código-fonte deve pensar em duas diretrizes fundamentais:
+
+* **1. Se o usuário apertar o botão várias vezes:**
+Para evitar que a criança atropele os áudios apertando o botão várias vezes, o sistema deve ficar temporariamente "surdo" durante as falas. Se o alto-falante estiver reproduzindo qualquer instrução ou feedback, cliques no botão de confirmação **devem ser ignorados**.
+*(Nota: Utilize a leitura digital do pino `BUSY` do módulo DFPlayer Mini. Ele opera em lógica invertida: Leitura `LOW` = áudio tocando, bloqueie o botão; Leitura `HIGH` = áudio finalizado, libere o clique).*
+
+* **2. Interrupção Imediata (Prioridade da Chave de Modo):**
+A detecção de mudança na chave de modos tem prioridade máxima no sistema. Se a criança mudar do "Modo Desafio" para o "Modo Livre" enquanto o alto-falante ainda estiver ditando um desafio, o sistema deve interromper a reprodução do áudio atual imediatamente e realizar a transição de modo.
+
+* **3. OUTRAS COISAS QUE NÃO ESTOU LEMBRANDO AGORA**
 ---
 
 ## 🛠️ Hardware Necessário 
