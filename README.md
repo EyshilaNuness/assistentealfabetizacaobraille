@@ -55,9 +55,9 @@ A detecção de mudança na chave de modos tem prioridade máxima no sistema. Se
 * **1x** Chave Alavanca / Seletora de 2 posições (Modo Livre / Modo Desafio)
 * **1x** Resistor de 1kΩ (Proteção da linha RX do módulo MP3)
 * **1x** Cartão MicroSD (Formatado em FAT32)
-* *Bateria de 3,7V.*
-* * Módulo carregador de Bateria TP4056.*
-* * Regulador de Tensão Step-up MT3608.*
+* Bateria de 3,7V.
+* Módulo carregador de Bateria TP4056.
+* Regulador de Tensão Step-up MT3608.
 
 ---
 
