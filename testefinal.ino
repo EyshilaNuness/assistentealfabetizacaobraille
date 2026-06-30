@@ -1,28 +1,31 @@
-#include <Arduino.h>
-#include <HardwareSerial.h>
+#include <SoftwareSerial.h>
 #include <DFRobotDFPlayerMini.h>
 
 // ==========================================
-// 1. MAPEAMENTO DE HARDWARE (ESP32-C3)
+// 1. MAPEAMENTO DE HARDWARE (ARDUINO NANO)
 // ==========================================
-const int PIN_P1 = 0;
-const int PIN_P2 = 1;
-const int PIN_P3 = 3;
-const int PIN_P4 = 4;
-const int PIN_P5 = 5;
-const int PIN_P6 = 6;
+// Pinos dos 6 botões (Pontos do Braille)
+const int PIN_P1 = 3;
+const int PIN_P2 = 5;
+const int PIN_P3 = 6;
+const int PIN_P4 = 7;
+const int PIN_P5 = 8;
+const int PIN_P6 = 9;
 
-const int PIN_MODO = 7;      
-const int PIN_CONFIRMA = 21;  
-const int PIN_BUSY = 8;      
+// Pinos de Controle
+const int PIN_MODO = 12;      // Chave de Modo (Livre/Desafio)
+const int PIN_CONFIRMA = 2;   // Botão de Confirmar (Pino D2)
+const int PIN_BUSY = 4;       // Fio Ocupado do DFPlayer (Pino D4)
 
-const int PIN_RX_DF = 2;     
-const int PIN_TX_DF = 10;    
+// Pinos de Comunicação Serial (SoftwareSerial)
+const int PIN_RX_NANO = 10;   // Vai ligado no TX do DFPlayer
+const int PIN_TX_NANO = 11;   // Vai ligado no RX do DFPlayer (Com resistor de 1k)
 
 // ==========================================
 // 2. VARIÁVEIS DO SISTEMA
 // ==========================================
-HardwareSerial mySerial(1);
+// Inicializando a porta serial virtual para o DFPlayer nos pinos 10 e 11
+SoftwareSerial mySoftwareSerial(PIN_RX_NANO, PIN_TX_NANO);
 DFRobotDFPlayerMini myDFPlayer;
 
 bool modoLivre = true;
@@ -77,7 +80,7 @@ void executarAudio(int idAudio) {
   printTextoAudio(idAudio);
   
   if (dfplayerPronto) {
-    // ATRASO 1: Dá tempo do módulo respirar entre os comandos curtos
+    // ATRASO 1: Dá tempo do módulo respirar entre comandos
     delay(400); 
     myDFPlayer.play(idAudio); 
   }
@@ -143,15 +146,16 @@ int identificarLetra(byte combinacao) {
 // SETUP
 // ==========================================
 void setup() {
+  // Inicializa o Monitor Serial
   Serial.begin(115200);
   
-  // ATRASO 2: Espera o computador conectar o Monitor Serial
-  delay(3000); 
+  delay(2000); 
   
   Serial.println("\n\n=========================================");
-  Serial.println("     SISTEMA BRAILLE - PASTA MP3 ATIVA     ");
+  Serial.println("     SISTEMA BRAILLE - ARDUINO NANO      ");
   Serial.println("=========================================");
 
+  // Configura os pinos como entrada com resistor interno ligado ao GND
   pinMode(PIN_P1, INPUT_PULLUP);
   pinMode(PIN_P2, INPUT_PULLUP);
   pinMode(PIN_P3, INPUT_PULLUP);
@@ -162,40 +166,36 @@ void setup() {
   pinMode(PIN_CONFIRMA, INPUT_PULLUP);
   pinMode(PIN_BUSY, INPUT_PULLUP); 
 
-  // --- SOLUÇÃO DO "CLIQUE FANTASMA" ---
-  // ATRASO 3: Dá um tempo para a energia nos fios estabilizar antes de ler
   delay(200); 
-  ultimoEstadoConfirma = digitalRead(PIN_CONFIRMA); // Lê o estado REAL do botão agora
-  ultimoEstadoModo = digitalRead(PIN_MODO);         // Lê o estado REAL da chave agora
+  ultimoEstadoConfirma = digitalRead(PIN_CONFIRMA); 
+  ultimoEstadoModo = digitalRead(PIN_MODO);         
   modoLivre = (ultimoEstadoModo == HIGH);
   
   Serial.print("[MODO INICIAL] Iniciado no modo: ");
   Serial.println(modoLivre ? "EXPLORACAO (LIVRE)" : "JOGO (DESAFIO)");
 
-  // --- SOLUÇÃO DO DFPLAYER ---
-  mySerial.begin(9600, SERIAL_8N1, PIN_RX_DF, PIN_TX_DF);
+  // Inicializa a porta serial virtual para o DFPlayer
+  mySoftwareSerial.begin(9600);
   
-  // ATRASO 4: OBRIGATÓRIO. Dá 2 segundos pro DFPlayer ligar de vez
   delay(2000); 
   
   Serial.println("[HARDWARE] Inicializando comunicação com o DFPlayer...");
   
-  // =========================================================================
-  // O TRUQUE DO CHIP CLONE: Parâmetros "false, true" forçam a inicialização!
-  // =========================================================================
-  if (myDFPlayer.begin(mySerial, false, true)) {
+  // O TRUQUE DO CHIP CLONE
+  if (myDFPlayer.begin(mySoftwareSerial, false, true)) {
     Serial.println("[HARDWARE] -> DFPlayer Mini conectado com sucesso!");
     dfplayerPronto = true;
     
-    myDFPlayer.volume(10); // Ajuste do volume
-    delay(1000); // ATRASO 5: Pausa essencial para o cartão SD ser lido sem engasgo
+    myDFPlayer.volume(10); 
+    delay(1000); 
     
-    executarAudio(27); // Boas-vindas
+    executarAudio(27); 
   } else {
     Serial.println("[HARDWARE] -> Erro: DFPlayer nao respondeu. Verifique fiação e/ou INVERTA RX/TX.");
   }
 
-  randomSeed(analogRead(2)); 
+  // Gera sementes aleatórias a partir de um pino analógico vazio (A0)
+  randomSeed(analogRead(A0)); 
 }
 
 // ==========================================
@@ -217,7 +217,7 @@ void loop() {
       
       Serial.println("\n[CHAVE] Mudança de modo detectada!");
       if (dfplayerPronto) myDFPlayer.stop(); 
-      delay(200); // Pausa para o módulo respirar entre comandos
+      delay(200); 
 
       if (modoLivre) {
         executarAudio(28); 
